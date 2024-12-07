@@ -15,12 +15,29 @@ h1 {
 form {
     margin-bottom: 20px;
     display: flex;
-    flex-direction: column;
     gap: 10px;
+    align-items: center;
 }
 
-input, button {
+input[type="text"] {
+    flex: 1;
+    padding: 8px;
     font-size: 1em;
+}
+
+button {
+    padding: 10px 15px;
+    font-size: 1em;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    background-color: #007BFF;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
 }
 
 /* Gaya untuk Tabel */
@@ -29,6 +46,7 @@ table {
     border-collapse: collapse;
     margin-bottom: 20px;
     font-size: 0.9em;
+    background-color: white;
 }
 
 table th, table td {
@@ -75,6 +93,5 @@ table th {
 
     input, button {
         font-size: 0.9em;
-        padding: 5px;
     }
 }
