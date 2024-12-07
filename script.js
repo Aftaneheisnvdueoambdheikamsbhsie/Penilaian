@@ -85,19 +85,49 @@ document.querySelector("#downloadExcel").addEventListener("click", () => {
 // Download PDF
 document.querySelector("#downloadPDF").addEventListener("click", () => {
     const doc = new jsPDF();
-    doc.text("Penilaian Ekskul Pencak Silat", 10, 10);
-    let startY = 20;
-    participants.forEach((p, i) => {
-        const scoresText = `Push-up: ${p.scores[0]}, Sit-up: ${p.scores[1]}, Plank: ${p.scores[2]}, Pukulan: ${p.scores[3]}, Tendangan: ${p.scores[4]}, Kuda-kuda: ${p.scores[5]}`;
-        doc.text(
-            `${i + 1}. ${p.nama} (Kelas: ${p.kelas}) - Total: ${p.total}, Nilai: ${p.grade} - ${scoresText}`,
-            10,
-            startY
-        );
-        startY += 10;
+
+    // Header PDF
+    doc.setFontSize(16);
+    doc.text("Penilaian Fighter Pencak Silat", 10, 10);
+
+    // Kolom tabel untuk PDF
+    const tableHeader = [
+        "No", 
+        "Nama", 
+        "Kelas", 
+        "Push-up", 
+        "Sit-up", 
+        "Plank", 
+        "Pukulan", 
+        "Tendangan", 
+        "Kuda-kuda", 
+        "Total", 
+        "Nilai"
+    ];
+
+    // Data tabel untuk PDF
+    const tableData = participants.map((p, i) => [
+        i + 1,
+        p.nama,
+        p.kelas,
+        ...p.scores,
+        p.total,
+        p.grade,
+    ]);
+
+    // Tambahkan tabel ke PDF
+    doc.autoTable({
+        head: [tableHeader],
+        body: tableData,
+        startY: 20,
+        styles: { fontSize: 10 },
+        theme: "grid",
     });
+
+    // Simpan PDF
     doc.save("Penilaian-Silat.pdf");
 });
+
 
 // Inisialisasi tabel
 renderTable();
