@@ -7,28 +7,33 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Sistem Penilaian Fighter Pencak Silat</h1>
-    <form id="inputForm">
-        <label for="nama">Nama Peserta:</label>
-        <input type="text" id="nama" placeholder="Masukkan nama peserta">
-        <button type="button" id="addParticipant">Tambah</button>
-    </form>
-    <table id="scoreTable">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>Push-up</th>
-                <th>Sit-up</th>
-                <th>Plank</th>
-                <th>Pukulan</th>
-                <th>Tendangan</th>
-                <th>Kuda-kuda</th>
-                <th>Nilai</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <h1>Sistem Penilaian Ekskul Pencak Silat</h1>
+<form id="inputForm">
+    <label for="nama">Nama Peserta:</label>
+    <input type="text" id="nama" placeholder="Masukkan nama peserta">
+    <label for="kelas">Kelas:</label>
+    <input type="text" id="kelas" placeholder="Masukkan kelas peserta">
+    <button type="button" id="addParticipant">Tambah</button>
+</form>
+
+<table id="scoreTable">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Kelas</th>
+            <th>Push-up</th>
+            <th>Sit-up</th>
+            <th>Plank</th>
+            <th>Pukulan</th>
+            <th>Tendangan</th>
+            <th>Kuda-kuda</th>
+            <th>Total</th>
+            <th>Nilai</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
     <button id="downloadExcel">Download Excel</button>
     <button id="downloadPDF">Download PDF</button>
 
