@@ -1,122 +1,146 @@
 /* Gaya Umum */
 body {
-    font-family: 'Roboto', sans-serif;
-    margin: 10px;
-    padding: 10px;
-    background-color: #fafafa; /* Latar belakang abu-abu terang */
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    padding: 20px;
+    background-color: #f7f7f7;
 }
 
 h1 {
     text-align: center;
-    margin-bottom: 20px;
-    font-size: 1.8em;
-    color: #333; /* Teks gelap */
+    margin-bottom: 30px;
+    font-size: 2em;
+    color: #333;
+    text-transform: uppercase;
+    font-weight: bold;
 }
 
+/* Form Input */
 form {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     display: flex;
-    gap: 10px;
+    gap: 20px;
     align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 input[type="text"] {
     flex: 1;
-    padding: 8px;
-    font-size: 1em;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 12px;
+    font-size: 1.1em;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 5px;
+    max-width: 300px;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
 }
 
 button {
-    padding: 10px 15px;
-    font-size: 1em;
+    padding: 12px 20px;
+    font-size: 1.1em;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
     border: none;
     cursor: pointer;
-    border-radius: 5px;
-    background-color: #4CAF50; /* Hijau */
-    color: white;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease;
+    margin: 10px;
 }
 
 button:hover {
-    background-color: #388E3C; /* Hijau gelap */
+    background-color: #0056b3;
 }
 
-/* Gaya untuk Tabel */
+button:active {
+    transform: scale(0.98);
+}
+
+/* Tabel */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
-    font-size: 0.9em;
-    background-color: white;
-    border: 1px solid #ddd; /* Border */
+    margin-top: 30px;
+    font-size: 1em;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
 }
 
 table th, table td {
-    border: 1px solid #ddd;
-    padding: 10px;
+    padding: 15px;
     text-align: center;
+    border: 1px solid #ddd;
 }
 
 table th {
-    background-color: #2196F3; /* Biru */
+    background-color: #007bff;
     color: white;
-}
-
-table tr:nth-child(odd) {
-    background-color: #f9f9f9; /* Abu-abu terang */
-}
-
-table tr:nth-child(even) {
-    background-color: #fff; /* Putih */
-}
-
-.grade {
     font-weight: bold;
+    text-transform: uppercase;
 }
 
+table td {
+    background-color: #f9f9f9;
+}
+
+/* Kolom Grade */
 .grade.A {
-    background-color: #4CAF50; /* Hijau untuk A */
-    color: white;
-    padding: 5px;
-    border-radius: 3px;
+    color: #28a745;
 }
 
 .grade.B {
-    background-color: #FF9800; /* Oranye untuk B */
-    color: white;
-    padding: 5px;
-    border-radius: 3px;
+    color: #dc3545;
 }
 
-.grade.B- {
-    background-color: #F44336; /* Merah untuk B- */
-    color: white;
-    padding: 5px;
-    border-radius: 3px;
+/* Signature Section */
+#signatureSection {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#signatureSection label {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+#signatureSection input {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1em;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+    margin: 5px;
+    max-width: 300px;
+    transition: all 0.3s ease;
+}
+
+#signatureSection input:focus {
+    border-color: #007bff;
 }
 
 /* Responsif untuk HP */
 @media (max-width: 768px) {
-    table {
-        font-size: 0.8em;
-    }
-
-    th, td {
-        padding: 5px;
-    }
-
-    h1 {
-        font-size: 1.2em;
-    }
-
     form {
         flex-direction: column;
-        gap: 5px;
+        gap: 10px;
     }
 
-    input, button {
+    table {
         font-size: 0.9em;
+    }
+
+    button {
+        font-size: 1em;
+        padding: 10px 15px;
     }
 }
