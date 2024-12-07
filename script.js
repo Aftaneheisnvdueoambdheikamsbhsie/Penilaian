@@ -5,7 +5,7 @@ let tableBody = document.querySelector("#scoreTable tbody");
 document.querySelector("#addParticipant").addEventListener("click", () => {
     const nama = document.querySelector("#nama").value.trim();
     if (nama) {
-        participants.push({ nama, scores: [0, 0, 0, 0, 0, 0] });
+        participants.push({ nama, scores: [0, 0, 0, 0, 0, 0], grade: "B" });
         renderTable();
         document.querySelector("#nama").value = "";
     }
@@ -15,6 +15,9 @@ document.querySelector("#addParticipant").addEventListener("click", () => {
 function renderTable() {
     tableBody.innerHTML = "";
     participants.forEach((participant, index) => {
+        const totalScore = participant.scores.reduce((sum, score) => sum + score, 0);
+        participant.grade = totalScore > 60 ? "A" : "B";
+
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${index + 1}</td>
@@ -25,6 +28,7 @@ function renderTable() {
                         `<td><input type="number" value="${score}" data-index="${index}" data-score="${i}" class="scoreInput"></td>`
                 )
                 .join("")}
+            <td class="grade">${participant.grade}</td>
         `;
         tableBody.appendChild(row);
     });
@@ -35,6 +39,7 @@ function renderTable() {
             const index = e.target.dataset.index;
             const scoreIndex = e.target.dataset.score;
             participants[index].scores[scoreIndex] = parseInt(e.target.value) || 0;
+            renderTable();
         });
     });
 }
@@ -43,8 +48,8 @@ function renderTable() {
 document.querySelector("#downloadExcel").addEventListener("click", () => {
     const wb = XLSX.utils.book_new();
     const wsData = [
-        ["No", "Nama", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda"],
-        ...participants.map((p, i) => [i + 1, p.nama, ...p.scores]),
+        ["No", "Nama", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda", "Nilai"],
+        ...participants.map((p, i) => [i + 1, p.nama, ...p.scores, p.grade]),
     ];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     XLSX.utils.book_append_sheet(wb, ws, "Penilaian");
@@ -57,12 +62,9 @@ document.querySelector("#downloadPDF").addEventListener("click", () => {
     doc.text("Penilaian Fighter Pencak Silat", 10, 10);
     let startY = 20;
     participants.forEach((p, i) => {
-        doc.text(
-            `${i + 1}. ${p.nama} - Push-up: ${p.scores[0]}, Sit-up: ${p.scores[1]}, Plank: ${p.scores[2]}, Pukulan: ${p.scores[3]}, Tendangan: ${p.scores[4]}, Kuda-kuda: ${p.scores[5]}`,
-            10,
-            startY
-        );
+        const scoresText = `Push-up: ${p.scores[0]}, Sit-up: ${p.scores[1]}, Plank: ${p.scores[2]}, Pukulan: ${p.scores[3]}, Tendangan: ${p.scores[4]}, Kuda-kuda: ${p.scores[5]}, Nilai: ${p.grade}`;
+        doc.text(`${i + 1}. ${p.nama} - ${scoresText}`, 10, startY);
         startY += 10;
     });
-    doc.save("Penilaian-Fighter.pdf");
+    doc.save("Penilaian-Ekskul-Silat-2024.pdf");
 });
