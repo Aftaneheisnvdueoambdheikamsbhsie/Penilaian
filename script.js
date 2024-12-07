@@ -15,9 +15,6 @@ document.querySelector("#addParticipant").addEventListener("click", () => {
 function renderTable() {
     tableBody.innerHTML = "";
     participants.forEach((participant, index) => {
-        const totalScore = participant.scores.reduce((sum, score) => sum + score, 0);
-        participant.grade = totalScore > 60 ? "A" : "B";
-
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${index + 1}</td>
@@ -28,22 +25,35 @@ function renderTable() {
                         `<td><input type="number" value="${score}" data-index="${index}" data-score="${i}" class="scoreInput"></td>`
                 )
                 .join("")}
-            <td class="grade ${participant.grade}">${participant.grade}</td>
+            <td class="grade">${participant.grade}</td>
         `;
         tableBody.appendChild(row);
     });
 
-    // Pastikan nilai lama tetap ada saat diinput ulang
+    // Tangani input nilai
     document.querySelectorAll(".scoreInput").forEach((input) => {
         input.addEventListener("input", (e) => {
             const index = e.target.dataset.index;
             const scoreIndex = e.target.dataset.score;
             participants[index].scores[scoreIndex] = parseInt(e.target.value) || 0;
-            renderTable(); // Render ulang dengan data baru
+            updateGrades(); // Perbarui grade setelah semua input
         });
-        input.addEventListener("focus", (e) => {
-            e.target.select(); // Pilih teks di dalam input untuk memudahkan pengeditan
-        });
+    });
+}
+
+// Perbarui grade berdasarkan nilai
+function updateGrades() {
+    participants.forEach((participant) => {
+        const totalScore = participant.scores.reduce((sum, score) => sum + score, 0);
+        participant.grade = totalScore > 60 ? "A" : "B";
+    });
+    renderGrades(); // Perbarui tampilan grade tanpa merender ulang tabel
+}
+
+// Render ulang hanya kolom grade
+function renderGrades() {
+    document.querySelectorAll(".grade").forEach((cell, i) => {
+        cell.textContent = participants[i].grade;
     });
 }
 
@@ -56,7 +66,7 @@ document.querySelector("#downloadExcel").addEventListener("click", () => {
     ];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     XLSX.utils.book_append_sheet(wb, ws, "Penilaian");
-    XLSX.writeFile(wb, "Penilaian-Silat-Fighter.xlsx");
+    XLSX.writeFile(wb, "Penilaian-Fighter.xlsx");
 });
 
 // Download PDF
@@ -69,5 +79,8 @@ document.querySelector("#downloadPDF").addEventListener("click", () => {
         doc.text(`${i + 1}. ${p.nama} - ${scoresText}`, 10, startY);
         startY += 10;
     });
-    doc.save("Penilaian-Silat-Fighter.pdf");
+    doc.save("Penilaian-Fighter.pdf");
 });
+
+// Inisialisasi tabel
+renderTable();
