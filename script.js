@@ -7,7 +7,7 @@ document.querySelector("#addParticipant").addEventListener("click", () => {
     if (nama) {
         participants.push({ nama, scores: [0, 0, 0, 0, 0, 0], grade: "B" });
         renderTable();
-        document.querySelector("#nama").value = "";
+        document.querySelector("#nama").value = ""; // Kosongkan input
     }
 });
 
@@ -28,18 +28,21 @@ function renderTable() {
                         `<td><input type="number" value="${score}" data-index="${index}" data-score="${i}" class="scoreInput"></td>`
                 )
                 .join("")}
-            <td class="grade">${participant.grade}</td>
+            <td class="grade ${participant.grade}">${participant.grade}</td>
         `;
         tableBody.appendChild(row);
     });
 
-    // Update nilai
+    // Pastikan nilai lama tetap ada saat diinput ulang
     document.querySelectorAll(".scoreInput").forEach((input) => {
         input.addEventListener("input", (e) => {
             const index = e.target.dataset.index;
             const scoreIndex = e.target.dataset.score;
             participants[index].scores[scoreIndex] = parseInt(e.target.value) || 0;
-            renderTable();
+            renderTable(); // Render ulang dengan data baru
+        });
+        input.addEventListener("focus", (e) => {
+            e.target.select(); // Pilih teks di dalam input untuk memudahkan pengeditan
         });
     });
 }
@@ -53,7 +56,7 @@ document.querySelector("#downloadExcel").addEventListener("click", () => {
     ];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     XLSX.utils.book_append_sheet(wb, ws, "Penilaian");
-    XLSX.writeFile(wb, "Penilaian-Fighter.xlsx");
+    XLSX.writeFile(wb, "Penilaian-Silat-Fighter.xlsx");
 });
 
 // Download PDF
@@ -66,5 +69,5 @@ document.querySelector("#downloadPDF").addEventListener("click", () => {
         doc.text(`${i + 1}. ${p.nama} - ${scoresText}`, 10, startY);
         startY += 10;
     });
-    doc.save("Penilaian-Ekskul-Silat-2024.pdf");
+    doc.save("Penilaian-Silat-Fighter.pdf");
 });
