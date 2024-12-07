@@ -38,3 +38,13 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+
+.grade {
+    font-weight: bold;
+    color: #28a745;
+}
+
+.grade.B {
+    color: #dc3545;
+}
+
