@@ -113,3 +113,40 @@ document.querySelector("#downloadPDF").addEventListener("click", () => {
 
     doc.save("Penilaian-Silat.pdf");
 });
+
+// Inisialisasi Signature Pad
+const canvas = document.getElementById("signatureCanvas");
+const signaturePad = new SignaturePad(canvas);
+
+// Fungsi untuk menghapus tanda tangan
+document.getElementById("clearSignature").addEventListener("click", () => {
+    signaturePad.clear();
+});
+
+// Fungsi untuk mengunduh tanda tangan sebagai JPEG
+document.getElementById("downloadJPEG").addEventListener("click", () => {
+    if (signaturePad.isEmpty()) {
+        alert("Harap tanda tangani terlebih dahulu.");
+    } else {
+        const signatureImage = signaturePad.toDataURL("image/jpeg");
+        const link = document.createElement("a");
+        link.href = signatureImage;
+        link.download = "Tanda-Tangan-Penguji.jpeg";
+        link.click();
+    }
+});
+
+// Fungsi untuk mendownload tabel sebagai gambar JPEG
+document.getElementById("downloadTableJPEG").addEventListener("click", () => {
+    const table = document.querySelector("table");
+    html2canvas(table, { 
+        backgroundColor: "white", 
+        logging: true 
+    }).then((canvas) => {
+        // Mengunduh gambar hasil tangkapan
+        const link = document.createElement("a");
+        link.href = canvas.toDataURL("image/jpeg");
+        link.download = "Tabel-Penilaian.jpeg";
+        link.click();
+    });
+});
