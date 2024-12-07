@@ -19,7 +19,7 @@ function renderTable() {
     tableBody.innerHTML = "";
     participants.forEach((participant, index) => {
         participant.total = participant.scores.reduce((sum, score) => sum + score, 0);
-        participant.grade = participant.total >= 75 ? "A" : "B";
+        participant.grade = participant.total >= 70 ? "A" : "B" ;
 
         const row = document.createElement("tr");
         row.innerHTML = `
@@ -53,7 +53,7 @@ function renderTable() {
 function updateGrades() {
     participants.forEach((participant) => {
         participant.total = participant.scores.reduce((sum, score) => sum + score, 0);
-        participant.grade = participant.total >= 75 ? "A" : "B";
+        participant.grade = participant.total >= 70 ? "A" : "B";
     });
     renderGrades(); // Perbarui tampilan grade tanpa merender ulang tabel
 }
