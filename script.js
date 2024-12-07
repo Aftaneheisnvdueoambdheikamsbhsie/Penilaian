@@ -19,7 +19,7 @@ function renderTable() {
     tableBody.innerHTML = "";
     participants.forEach((participant, index) => {
         participant.total = participant.scores.reduce((sum, score) => sum + score, 0);
-        participant.grade = participant.total > 60 ? "A" : "B";
+        participant.grade = participant.total >= 75 ? "A" : "B";
 
         const row = document.createElement("tr");
         row.innerHTML = `
@@ -53,7 +53,7 @@ function renderTable() {
 function updateGrades() {
     participants.forEach((participant) => {
         participant.total = participant.scores.reduce((sum, score) => sum + score, 0);
-        participant.grade = participant.total > 60 ? "A" : "B";
+        participant.grade = participant.total >= 75 ? "A" : "B";
     });
     renderGrades(); // Perbarui tampilan grade tanpa merender ulang tabel
 }
@@ -79,43 +79,24 @@ document.querySelector("#downloadExcel").addEventListener("click", () => {
     ];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     XLSX.utils.book_append_sheet(wb, ws, "Penilaian");
-    XLSX.writeFile(wb, "Penilaian-Silat.xlsx");
+    XLSX.writeFile(wb, "Penilaian-Fighter.xlsx");
 });
 
 // Download PDF
 document.querySelector("#downloadPDF").addEventListener("click", () => {
     const doc = new jsPDF();
 
-    // Header PDF
     doc.setFontSize(16);
     doc.text("Penilaian Fighter Pencak Silat", 10, 10);
 
-    // Kolom tabel untuk PDF
     const tableHeader = [
-        "No", 
-        "Nama", 
-        "Kelas", 
-        "Push-up", 
-        "Sit-up", 
-        "Plank", 
-        "Pukulan", 
-        "Tendangan", 
-        "Kuda-kuda", 
-        "Total", 
-        "Nilai"
+        "No", "Nama", "Kelas", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda", "Total", "Nilai"
     ];
 
-    // Data tabel untuk PDF
     const tableData = participants.map((p, i) => [
-        i + 1,
-        p.nama,
-        p.kelas,
-        ...p.scores,
-        p.total,
-        p.grade,
+        i + 1, p.nama, p.kelas, ...p.scores, p.total, p.grade
     ]);
 
-    // Tambahkan tabel ke PDF
     doc.autoTable({
         head: [tableHeader],
         body: tableData,
@@ -124,10 +105,8 @@ document.querySelector("#downloadPDF").addEventListener("click", () => {
         theme: "grid",
     });
 
-    // Simpan PDF
-    doc.save("Penilaian-Silat.pdf");
+    doc.save("Penilaian-Fighter.pdf");
 });
-
 
 // Inisialisasi tabel
 renderTable();
