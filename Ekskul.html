@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Penilaian Fighter Pencak Silat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Sistem Penilaian Fighter Pencak Silat</h1>
+    <form id="inputForm">
+        <label for="nama">Nama Peserta:</label>
+        <input type="text" id="nama" placeholder="Masukkan nama peserta">
+        <button type="button" id="addParticipant">Tambah</button>
+    </form>
+    <table id="scoreTable">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Push-up</th>
+                <th>Sit-up</th>
+                <th>Plank</th>
+                <th>Pukulan</th>
+                <th>Tendangan</th>
+                <th>Kuda-kuda</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <button id="downloadExcel">Download Excel</button>
+    <button id="downloadPDF">Download PDF</button>
+
+    <script src="libs/xlsx.full.min.js"></script>
+    <script src="libs/jspdf.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
