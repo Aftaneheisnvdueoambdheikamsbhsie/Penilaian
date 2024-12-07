@@ -1,16 +1,15 @@
 let participants = [];
-let tableBody = document.querySelector("#scoreTable tbody");
+const tableBody = document.querySelector("#scoreTable tbody");
 
 // Tambahkan peserta ke tabel
 document.querySelector("#addParticipant").addEventListener("click", () => {
     const nama = document.querySelector("#nama").value.trim();
     const kelas = document.querySelector("#kelas").value.trim();
-
     if (nama && kelas) {
-        participants.push({ nama, kelas, scores: [0, 0, 0, 0, 0, 0], total: 0, grade: "B" });
+        participants.push({ nama, kelas, scores: [0, 0, 0, 0, 0, 0], sikap: "B", total: 0, grade: "" });
         renderTable();
-        document.querySelector("#nama").value = ""; // Kosongkan input nama
-        document.querySelector("#kelas").value = ""; // Kosongkan input kelas
+        document.querySelector("#nama").value = "";
+        document.querySelector("#kelas").value = "";
     }
 });
 
@@ -18,9 +17,6 @@ document.querySelector("#addParticipant").addEventListener("click", () => {
 function renderTable() {
     tableBody.innerHTML = "";
     participants.forEach((participant, index) => {
-        participant.total = participant.scores.reduce((sum, score) => sum + score, 0);
-        participant.grade = participant.total >= 70 ? "A" : "B" ;
-
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${index + 1}</td>
@@ -32,81 +28,88 @@ function renderTable() {
                         `<td><input type="number" value="${score}" data-index="${index}" data-score="${i}" class="scoreInput"></td>`
                 )
                 .join("")}
-            <td>${participant.total}</td>
-            <td class="grade ${participant.grade}">${participant.grade}</td>
+            <td>
+                <select data-index="${index}" class="sikapSelect">
+                    <option value="B" ${participant.sikap === "B" ? "selected" : ""}>B</option>
+                    <option value="B-" ${participant.sikap === "B-" ? "selected" : ""}>B-</option>
+                </select>
+            </td>
+            <td class="total">${participant.total}</td>
+            <td class="grade">${participant.grade}</td>
         `;
         tableBody.appendChild(row);
     });
 
-    // Tangani input nilai
+    // Event listener untuk input nilai
     document.querySelectorAll(".scoreInput").forEach((input) => {
         input.addEventListener("input", (e) => {
             const index = e.target.dataset.index;
             const scoreIndex = e.target.dataset.score;
             participants[index].scores[scoreIndex] = parseInt(e.target.value) || 0;
-            updateGrades(); // Perbarui total dan grade
+            updateGrade(index);
+        });
+    });
+
+    // Event listener untuk pilihan sikap
+    document.querySelectorAll(".sikapSelect").forEach((select) => {
+        select.addEventListener("change", (e) => {
+            const index = e.target.dataset.index;
+            participants[index].sikap = e.target.value;
+            updateGrade(index);
         });
     });
 }
 
-// Perbarui grade dan total nilai
-function updateGrades() {
-    participants.forEach((participant) => {
-        participant.total = participant.scores.reduce((sum, score) => sum + score, 0);
-        participant.grade = participant.total >= 70 ? "A" : "B";
-    });
-    renderGrades(); // Perbarui tampilan grade tanpa merender ulang tabel
-}
+// Hitung total nilai dan grade
+function updateGrade(index) {
+    const participant = participants[index];
+    participant.total = participant.scores.reduce((sum, score) => sum + score, 0);
 
-// Render ulang hanya kolom total dan grade
-function renderGrades() {
-    document.querySelectorAll(".grade").forEach((cell, i) => {
-        cell.textContent = participants[i].grade;
-    });
+    // Logika sikap
+    if (participant.sikap === "B-") {
+        participant.total -= 5; // Kurangi 5 poin jika sikap B-
+    } else if (participant.sikap === "B") {
+        participant.total += 5; // Tambah 5 poin jika sikap B
+        participant.total = Math.min(participant.total, 100); // Maksimum 100 poin
+    }
 
-    tableBody.querySelectorAll("tr").forEach((row, i) => {
-        const totalCell = row.querySelector("td:nth-last-child(2)");
-        totalCell.textContent = participants[i].total;
-    });
+    participant.grade = participant.total >= 75 ? "A" : "B";
+
+    // Render ulang nilai total dan grade
+    const row = tableBody.children[index];
+    row.querySelector(".total").textContent = participant.total;
+    row.querySelector(".grade").textContent = participant.grade;
 }
 
 // Download Excel
 document.querySelector("#downloadExcel").addEventListener("click", () => {
     const wb = XLSX.utils.book_new();
     const wsData = [
-        ["No", "Nama", "Kelas", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda", "Total", "Nilai"],
-        ...participants.map((p, i) => [i + 1, p.nama, p.kelas, ...p.scores, p.total, p.grade]),
+        ["No", "Nama", "Kelas", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda", "Sikap", "Total", "Grade"],
+        ...participants.map((p, i) => [i + 1, p.nama, p.kelas, ...p.scores, p.sikap, p.total, p.grade]),
     ];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     XLSX.utils.book_append_sheet(wb, ws, "Penilaian");
-    XLSX.writeFile(wb, "Penilaian-Fighter.xlsx");
+    XLSX.writeFile(wb, "Penilaian-Silat.xlsx");
 });
 
 // Download PDF
 document.querySelector("#downloadPDF").addEventListener("click", () => {
     const doc = new jsPDF();
+    doc.text("Penilaian Ekskul Pencak Silat", 10, 10);
+    const tableColumn = ["No", "Nama", "Kelas", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda", "Sikap", "Total", "Grade"];
+    const tableRows = [];
 
-    doc.setFontSize(16);
-    doc.text("Penilaian Fighter Pencak Silat", 10, 10);
-
-    const tableHeader = [
-        "No", "Nama", "Kelas", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda", "Total", "Nilai"
-    ];
-
-    const tableData = participants.map((p, i) => [
-        i + 1, p.nama, p.kelas, ...p.scores, p.total, p.grade
-    ]);
-
-    doc.autoTable({
-        head: [tableHeader],
-        body: tableData,
-        startY: 20,
-        styles: { fontSize: 10 },
-        theme: "grid",
+    participants.forEach((p, i) => {
+        tableRows.push([i + 1, p.nama, p.kelas, ...p.scores, p.sikap, p.total, p.grade]);
     });
 
-    doc.save("Penilaian-Fighter.pdf");
-});
+    doc.autoTable({
+        head: [tableColumn],
+        body: tableRows,
+        startY: 20,
+        theme: "striped",
+    });
 
-// Inisialisasi tabel
-renderTable();
+    doc.save("Penilaian-Silat.pdf");
+});
