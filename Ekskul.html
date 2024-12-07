@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Penilaian Fighter Pencak Silat</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@0.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
     <h1>Sistem Penilaian Ekskul Pencak Silat</h1>
@@ -37,6 +39,16 @@
 </table>
     <button id="downloadExcel">Download Excel</button>
     <button id="downloadPDF">Download PDF</button>
+    <button id="downloadPDF">Download JPEG</button>
+
+    <div id="signatureSection">
+    <label for="signature">Tanda Tangan Penguji:</label>
+    <canvas id="signatureCanvas" width="400" height="100" style="border: 1px solid #ddd; border-radius: 10px;"></canvas>
+    <button type="button" id="clearSignature">Clear</button>
+    <label for="evaluatorName">Nama Penguji:</label>
+    <input type="text" id="evaluatorName" placeholder="Nama terang penguji">
+    </div>
+
 
     <script src="libs/xlsx.full.min.js"></script>
     <script src="libs/jspdf.min.js"></script>
