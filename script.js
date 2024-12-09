@@ -113,13 +113,48 @@ function updateGrade(index) {
 
 // Unduh Excel
 document.querySelector("#downloadExcel").addEventListener("click", () => {
+    const evaluatorName = document.querySelector("#evaluatorName").value.trim();
+    const signatureImage = signaturePad.isEmpty() ? null : signaturePad.toDataURL("image/png");
+
     const wb = XLSX.utils.book_new();
+
+    // Data Header
     const wsData = [
-        ["No", "Nama", "Kelas", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda", "Sikap", "Total", "Grade"],
-        ...participants.map((p, i) => [i + 1, p.nama, p.kelas, ...p.scores, p.sikap, p.total, p.grade]),
+        ["Penilaian Ekskul Pencak Silat"],
+        evaluatorName ? [`Penguji: ${evaluatorName}`] : [],
+        [],
+        ["No", "Nama", "Kelas", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda", "Sikap", "Total", "Grade"]
     ];
+
+    // Tambahkan Data Peserta
+    participants.forEach((p, i) => {
+        wsData.push([i + 1, p.nama, p.kelas, ...p.scores, p.sikap, p.total, p.grade]);
+    });
+
+    // Tambahkan Worksheet
     const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+    // Tambahkan Tanda Tangan sebagai Base64 (jika ada)
+    if (signatureImage) {
+        ws["!images"] = [
+            {
+                name: "Signature",
+                data: signatureImage,
+                type: "image/png",
+                position: {
+                    type: "twoCellAnchor",
+                    attrs: {
+                        from: { col: 0, row: wsData.length + 2 },
+                        to: { col: 5, row: wsData.length + 4 }
+                    }
+                }
+            }
+        ];
+    }
+
     XLSX.utils.book_append_sheet(wb, ws, "Penilaian");
+
+    // Unduh File
     XLSX.writeFile(wb, "Penilaian-Silat.xlsx");
 });
 
