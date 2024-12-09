@@ -42,48 +42,33 @@ function renderTable() {
             </td>
             <td class="total">${participant.total}</td>
             <td class="grade">${participant.grade}</td>
+            <td>
+                <button class="editRow" data-index="${index}">✏️</button>
+                <button class="deleteRow" data-index="${index}">🗑️</button>
+            </td>
         `;
         tableBody.appendChild(row);
     });
 
-    // Event listener untuk input nilai
-    document.querySelectorAll(".scoreInput").forEach((input) => {
-        input.addEventListener("input", (e) => {
-            const index = e.target.dataset.index;
-            const scoreIndex = e.target.dataset.score;
-            participants[index].scores[scoreIndex] = parseInt(e.target.value) || 0;
-            updateGrade(index);
-        });
+    attachEventListeners();
+}
 
-        // Navigasi dengan Enter
-        input.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                const inputs = Array.from(document.querySelectorAll(".scoreInput"));
-                const currentIndex = inputs.indexOf(e.target);
-                if (currentIndex !== -1) {
-                    const nextInput = inputs[currentIndex + 1] || inputs[0];
-                    nextInput.focus();
-                }
-            }
+// Tambahkan event listener untuk edit dan hapus
+function attachEventListeners() {
+    document.querySelectorAll(".deleteRow").forEach((button) => {
+        button.addEventListener("click", (e) => {
+            const index = e.target.dataset.index;
+            participants.splice(index, 1);
+            saveToLocalStorage();
+            renderTable();
         });
     });
 
-    // Event listener untuk pilihan sikap
-    document.querySelectorAll(".sikapSelect").forEach((select) => {
-        select.addEventListener("change", (e) => {
-            const index = e.target.dataset.index;
-            participants[index].sikap = e.target.value;
-            updateGrade(index);
-        });
-    });
-
-    // Event listener untuk pengeditan nama dan kelas
     document.querySelectorAll(".editable").forEach((cell) => {
         cell.addEventListener("blur", (e) => {
-            const rowIndex = [...e.target.parentElement.parentElement.children].indexOf(e.target.parentElement) - 1;
-            const key = e.target.classList.contains("nama") ? "nama" : "kelas";
-            participants[rowIndex][key] = e.target.textContent.trim();
+            const rowIndex = [...cell.parentElement.parentElement.children].indexOf(cell.parentElement) - 1;
+            const key = cell.classList.contains("nama") ? "nama" : "kelas";
+            participants[rowIndex][key] = cell.textContent.trim();
             saveToLocalStorage();
         });
     });
@@ -105,7 +90,6 @@ function updateGrade(index) {
     participant.grade = participant.total >= 75 ? "A" : "B";
     saveToLocalStorage();
 
-    // Render ulang nilai total dan grade
     const row = tableBody.children[index];
     row.querySelector(".total").textContent = participant.total;
     row.querySelector(".grade").textContent = participant.grade;
@@ -114,8 +98,6 @@ function updateGrade(index) {
 // Unduh Excel
 document.querySelector("#downloadExcel").addEventListener("click", () => {
     const evaluatorName = document.querySelector("#evaluatorName").value.trim();
-    const signatureImage = signaturePad.isEmpty() ? null : signaturePad.toDataURL("image/png");
-
     const wb = XLSX.utils.book_new();
 
     // Data Header
@@ -133,28 +115,8 @@ document.querySelector("#downloadExcel").addEventListener("click", () => {
 
     // Tambahkan Worksheet
     const ws = XLSX.utils.aoa_to_sheet(wsData);
-
-    // Tambahkan Tanda Tangan sebagai Base64 (jika ada)
-    if (signatureImage) {
-        ws["!images"] = [
-            {
-                name: "Signature",
-                data: signatureImage,
-                type: "image/png",
-                position: {
-                    type: "twoCellAnchor",
-                    attrs: {
-                        from: { col: 0, row: wsData.length + 2 },
-                        to: { col: 5, row: wsData.length + 4 }
-                    }
-                }
-            }
-        ];
-    }
-
     XLSX.utils.book_append_sheet(wb, ws, "Penilaian");
 
-    // Unduh File
     XLSX.writeFile(wb, "Penilaian-Silat.xlsx");
 });
 
@@ -178,7 +140,7 @@ document.querySelector("#downloadJPEG").addEventListener("click", () => {
         link.href = canvas.toDataURL("image/jpeg");
         link.click();
     });
-});
+    
 // Inisialisasi Signature Pad
 const canvas = document.getElementById("signatureCanvas");
 const signaturePad = new SignaturePad(canvas, {
