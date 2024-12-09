@@ -118,29 +118,47 @@ function updateGrade(index) {
     row.querySelector(".total").textContent = participant.total;
     row.querySelector(".grade").textContent = participant.grade;
 }
+
 // Unduh Excel
 document.querySelector("#downloadExcel").addEventListener("click", () => {
-    const evaluatorName = document.querySelector("#evaluatorName").value.trim();
     const wb = XLSX.utils.book_new();
-
-    // Data Header
     const wsData = [
-        ["Penilaian Ekskul Pencak Silat"],
-        evaluatorName ? [`Penguji: ${evaluatorName}`] : [],
-        [],
-        ["No", "Nama", "Kelas", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda", "Sikap", "Total", "Grade"]
+        ["No", "Nama", "Kelas", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda", "Sikap", "Total", "Grade"],
+        ...participants.map((p, i) => [i + 1, p.nama, p.kelas, ...p.scores, p.sikap, p.total, p.grade]),
     ];
-
-    // Tambahkan Data Peserta
-    participants.forEach((p, i) => {
-        wsData.push([i + 1, p.nama, p.kelas, ...p.scores, p.sikap, p.total, p.grade]);
-    });
-
-    // Tambahkan Worksheet
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     XLSX.utils.book_append_sheet(wb, ws, "Penilaian");
-
     XLSX.writeFile(wb, "Penilaian-Silat.xlsx");
+});
+
+// Unduh PDF
+document.querySelector("#downloadPDF").addEventListener("click", () => {
+    const doc = new jsPDF();
+    doc.text("Penilaian Ekskul Pencak Silat", 10, 10);
+    const tableColumn = ["No", "Nama", "Kelas", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda", "Sikap", "Total", "Grade"];
+    const tableRows = participants.map((p, i) => [i + 1, p.nama, p.kelas, ...p.scores, p.sikap, p.total, p.grade]);
+
+    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+    doc.save("Penilaian-Silat.pdf");
+});
+
+// Unduh JPEG
+document.querySelector("#downloadJPEG").addEventListener("click", () => {
+    const element = document.querySelector("#scoreTable");
+    html2canvas(element).then((canvas) => {
+        const link = document.createElement("a");
+        link.download = "Penilaian-Silat.jpeg";
+        link.href = canvas.toDataURL("image/jpeg");
+        link.click();
+    });
+});
+
+// Fitur Tanda Tangan
+const canvas = document.querySelector("#signatureCanvas");
+const signaturePad = new SignaturePad(canvas);
+
+document.querySelector("#clearSignature").addEventListener("click", () => {
+    signaturePad.clear();
 });
 
 renderTable();
