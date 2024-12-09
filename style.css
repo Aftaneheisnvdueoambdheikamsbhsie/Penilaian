@@ -98,6 +98,36 @@ table td {
 .grade.B {
     color: #dc3545;
 }
+/* Ikon Edit dan Hapus */
+button.edit-btn {
+    background-color: #ffc107; /* Kuning untuk edit */
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+}
+
+button.edit-btn:hover {
+    background-color: #e0a800;
+}
+
+button.delete-btn {
+    background-color: #dc3545; /* Merah untuk hapus */
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+}
+
+button.delete-btn:hover {
+    background-color: #c82333;
+}
 
 /* Signature Section */
 /* Tambahan untuk tanda tangan */
