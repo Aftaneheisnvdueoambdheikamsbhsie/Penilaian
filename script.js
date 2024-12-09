@@ -141,14 +141,41 @@ function updateGrade(index) {
 // Unduh Excel
 document.querySelector("#downloadExcel").addEventListener("click", () => {
     const wb = XLSX.utils.book_new();
+
+    // Data untuk worksheet
     const wsData = [
         ["No", "Nama", "Kelas", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda", "Sikap", "Total", "Grade"],
         ...participants.map((p, i) => [i + 1, p.nama, p.kelas, ...p.scores, p.sikap, p.total, p.grade]),
     ];
+
+    // Buat worksheet
     const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+    // Atur perataan kolom
+    const columnStyles = [
+        { wch: 5, alignment: { horizontal: "center" } }, // No
+        { wch: 20, alignment: { horizontal: "left" } }, // Nama
+        { wch: 10, alignment: { horizontal: "left" } }, // Kelas
+        { wch: 10, alignment: { horizontal: "center" } }, // Push-up
+        { wch: 10, alignment: { horizontal: "center" } }, // Sit-up
+        { wch: 10, alignment: { horizontal: "center" } }, // Plank
+        { wch: 10, alignment: { horizontal: "center" } }, // Pukulan
+        { wch: 10, alignment: { horizontal: "center" } }, // Tendangan
+        { wch: 10, alignment: { horizontal: "center" } }, // Kuda-kuda
+        { wch: 10, alignment: { horizontal: "center" } }, // Sikap
+        { wch: 10, alignment: { horizontal: "center" } }, // Total
+        { wch: 10, alignment: { horizontal: "center" } }, // Grade
+    ];
+
+    ws["!cols"] = columnStyles; // Terapkan gaya kolom
+
+    // Tambahkan worksheet ke workbook
     XLSX.utils.book_append_sheet(wb, ws, "Penilaian");
+
+    // Unduh file Excel
     XLSX.writeFile(wb, "Penilaian-Silat.xlsx");
 });
+
 
 // Unduh PDF
 document.querySelector("#downloadPDF").addEventListener("click", () => {
