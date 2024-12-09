@@ -113,16 +113,22 @@ function renderTable() {
 // Hitung total nilai dan grade
 function updateGrade(index) {
     const participant = participants[index];
-    participant.total = participant.scores.reduce((sum, score) => sum + score, 0);
+    
+    // Hitung ulang nilai total tanpa memperhitungkan sikap
+    const baseTotal = participant.scores.reduce((sum, score) => sum + score, 0);
 
-    // Logika sikap
+    // Hitung total dengan pengaruh sikap
+    let adjustment = 0;
     if (participant.sikap === "B-") {
-        participant.total -= 5;
+        adjustment = -5;
     } else if (participant.sikap === "B") {
-        participant.total += 5;
-        participant.total = Math.min(participant.total, 100);
+        adjustment = 5;
     }
 
+    participant.total = Math.max(0, baseTotal + adjustment); // Hindari nilai negatif
+    participant.total = Math.min(participant.total, 100); // Batas maksimum 100
+
+    // Tentukan grade
     participant.grade = participant.total >= 75 ? "A" : "B";
     saveToLocalStorage();
 
