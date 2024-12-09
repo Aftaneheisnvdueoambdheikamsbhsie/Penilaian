@@ -58,6 +58,19 @@ function renderTable() {
             participants[index].scores[scoreIndex] = parseInt(e.target.value) || 0;
             updateGrade(index);
         });
+        
+        // Navigasi dengan Enter
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                const inputs = Array.from(document.querySelectorAll(".scoreInput"));
+                const currentIndex = inputs.indexOf(e.target);
+                if (currentIndex !== -1) {
+                    const nextInput = inputs[currentIndex + 1] || inputs[0];
+                    nextInput.focus();
+                }
+            }
+        });
     });
 
     // Event listener untuk pilihan sikap
