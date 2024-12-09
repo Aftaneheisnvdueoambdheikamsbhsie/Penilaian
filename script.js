@@ -179,13 +179,30 @@ document.querySelector("#downloadJPEG").addEventListener("click", () => {
         link.click();
     });
 });
+// Inisialisasi Signature Pad
+const canvas = document.getElementById("signatureCanvas");
+const signaturePad = new SignaturePad(canvas, {
+    backgroundColor: 'rgba(255, 255, 255, 1)', // Warna latar belakang kanvas
+    penColor: 'black',                        // Warna tinta
+});
 
-// Fitur Tanda Tangan
-const canvas = document.querySelector("#signatureCanvas");
-const signaturePad = new SignaturePad(canvas);
-
-document.querySelector("#clearSignature").addEventListener("click", () => {
+// Fungsi untuk menghapus tanda tangan
+document.getElementById("clearSignature").addEventListener("click", () => {
     signaturePad.clear();
+});
+
+// Pastikan kanvas dapat disesuaikan ukurannya dengan layar
+function resizeCanvas() {
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = canvas.offsetHeight * ratio;
+    canvas.getContext("2d").scale(ratio, ratio);
+    signaturePad.clear(); // Kosongkan tanda tangan setelah resize
+}
+
+// Panggil fungsi resizeCanvas setiap kali halaman di-load
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 });
 
 renderTable();
