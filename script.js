@@ -42,33 +42,48 @@ function renderTable() {
             </td>
             <td class="total">${participant.total}</td>
             <td class="grade">${participant.grade}</td>
-            <td>
-                <button class="editRow" data-index="${index}">✏️</button>
-                <button class="deleteRow" data-index="${index}">🗑️</button>
-            </td>
         `;
         tableBody.appendChild(row);
     });
 
-    attachEventListeners();
-}
-
-// Tambahkan event listener untuk edit dan hapus
-function attachEventListeners() {
-    document.querySelectorAll(".deleteRow").forEach((button) => {
-        button.addEventListener("click", (e) => {
+    // Event listener untuk input nilai
+    document.querySelectorAll(".scoreInput").forEach((input) => {
+        input.addEventListener("input", (e) => {
             const index = e.target.dataset.index;
-            participants.splice(index, 1);
-            saveToLocalStorage();
-            renderTable();
+            const scoreIndex = e.target.dataset.score;
+            participants[index].scores[scoreIndex] = parseInt(e.target.value) || 0;
+            updateGrade(index);
+        });
+
+        // Navigasi dengan Enter
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                const inputs = Array.from(document.querySelectorAll(".scoreInput"));
+                const currentIndex = inputs.indexOf(e.target);
+                if (currentIndex !== -1) {
+                    const nextInput = inputs[currentIndex + 1] || inputs[0];
+                    nextInput.focus();
+                }
+            }
         });
     });
 
+    // Event listener untuk pilihan sikap
+    document.querySelectorAll(".sikapSelect").forEach((select) => {
+        select.addEventListener("change", (e) => {
+            const index = e.target.dataset.index;
+            participants[index].sikap = e.target.value;
+            updateGrade(index);
+        });
+    });
+
+    // Event listener untuk pengeditan nama dan kelas
     document.querySelectorAll(".editable").forEach((cell) => {
         cell.addEventListener("blur", (e) => {
-            const rowIndex = [...cell.parentElement.parentElement.children].indexOf(cell.parentElement) - 1;
-            const key = cell.classList.contains("nama") ? "nama" : "kelas";
-            participants[rowIndex][key] = cell.textContent.trim();
+            const rowIndex = [...e.target.parentElement.parentElement.children].indexOf(e.target.parentElement) - 1;
+            const key = e.target.classList.contains("nama") ? "nama" : "kelas";
+            participants[rowIndex][key] = e.target.textContent.trim();
             saveToLocalStorage();
         });
     });
@@ -90,6 +105,7 @@ function updateGrade(index) {
     participant.grade = participant.total >= 75 ? "A" : "B";
     saveToLocalStorage();
 
+    // Render ulang nilai total dan grade
     const row = tableBody.children[index];
     row.querySelector(".total").textContent = participant.total;
     row.querySelector(".grade").textContent = participant.grade;
@@ -97,26 +113,13 @@ function updateGrade(index) {
 
 // Unduh Excel
 document.querySelector("#downloadExcel").addEventListener("click", () => {
-    const evaluatorName = document.querySelector("#evaluatorName").value.trim();
     const wb = XLSX.utils.book_new();
-
-    // Data Header
     const wsData = [
-        ["Penilaian Ekskul Pencak Silat"],
-        evaluatorName ? [`Penguji: ${evaluatorName}`] : [],
-        [],
-        ["No", "Nama", "Kelas", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda", "Sikap", "Total", "Grade"]
+        ["No", "Nama", "Kelas", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda", "Sikap", "Total", "Grade"],
+        ...participants.map((p, i) => [i + 1, p.nama, p.kelas, ...p.scores, p.sikap, p.total, p.grade]),
     ];
-
-    // Tambahkan Data Peserta
-    participants.forEach((p, i) => {
-        wsData.push([i + 1, p.nama, p.kelas, ...p.scores, p.sikap, p.total, p.grade]);
-    });
-
-    // Tambahkan Worksheet
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     XLSX.utils.book_append_sheet(wb, ws, "Penilaian");
-
     XLSX.writeFile(wb, "Penilaian-Silat.xlsx");
 });
 
@@ -140,31 +143,14 @@ document.querySelector("#downloadJPEG").addEventListener("click", () => {
         link.href = canvas.toDataURL("image/jpeg");
         link.click();
     });
-    
-// Inisialisasi Signature Pad
-const canvas = document.getElementById("signatureCanvas");
-const signaturePad = new SignaturePad(canvas, {
-    backgroundColor: 'rgba(255, 255, 255, 1)', // Warna latar belakang kanvas
-    penColor: 'black',                        // Warna tinta
 });
 
-// Fungsi untuk menghapus tanda tangan
-document.getElementById("clearSignature").addEventListener("click", () => {
+// Fitur Tanda Tangan
+const canvas = document.querySelector("#signatureCanvas");
+const signaturePad = new SignaturePad(canvas);
+
+document.querySelector("#clearSignature").addEventListener("click", () => {
     signaturePad.clear();
-});
-
-// Pastikan kanvas dapat disesuaikan ukurannya dengan layar
-function resizeCanvas() {
-    const ratio = Math.max(window.devicePixelRatio || 1, 1);
-    canvas.width = canvas.offsetWidth * ratio;
-    canvas.height = canvas.offsetHeight * ratio;
-    canvas.getContext("2d").scale(ratio, ratio);
-    signaturePad.clear(); // Kosongkan tanda tangan setelah resize
-}
-
-// Panggil fungsi resizeCanvas setiap kali halaman di-load
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
 });
 
 renderTable();
