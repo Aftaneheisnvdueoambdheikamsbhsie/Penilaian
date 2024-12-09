@@ -1,4 +1,4 @@
-let participants = [];
+let participants = JSON.parse(localStorage.getItem("participants")) || [];
 const tableBody = document.querySelector("#scoreTable tbody");
 
 // Tambahkan peserta ke tabel
@@ -7,11 +7,17 @@ document.querySelector("#addParticipant").addEventListener("click", () => {
     const kelas = document.querySelector("#kelas").value.trim();
     if (nama && kelas) {
         participants.push({ nama, kelas, scores: [0, 0, 0, 0, 0, 0], sikap: "B", total: 0, grade: "" });
+        saveToLocalStorage();
         renderTable();
         document.querySelector("#nama").value = "";
         document.querySelector("#kelas").value = "";
     }
 });
+
+// Simpan data ke localStorage
+function saveToLocalStorage() {
+    localStorage.setItem("participants", JSON.stringify(participants));
+}
 
 // Render tabel
 function renderTable() {
@@ -20,8 +26,8 @@ function renderTable() {
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${index + 1}</td>
-            <td>${participant.nama}</td>
-            <td>${participant.kelas}</td>
+            <td contenteditable="true" class="editable nama">${participant.nama}</td>
+            <td contenteditable="true" class="editable kelas">${participant.kelas}</td>
             ${participant.scores
                 .map(
                     (score, i) =>
@@ -48,6 +54,19 @@ function renderTable() {
             participants[index].scores[scoreIndex] = parseInt(e.target.value) || 0;
             updateGrade(index);
         });
+
+        // Navigasi dengan Enter
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                const inputs = Array.from(document.querySelectorAll(".scoreInput"));
+                const currentIndex = inputs.indexOf(e.target);
+                if (currentIndex !== -1) {
+                    const nextInput = inputs[currentIndex + 1] || inputs[0];
+                    nextInput.focus();
+                }
+            }
+        });
     });
 
     // Event listener untuk pilihan sikap
@@ -56,6 +75,16 @@ function renderTable() {
             const index = e.target.dataset.index;
             participants[index].sikap = e.target.value;
             updateGrade(index);
+        });
+    });
+
+    // Event listener untuk pengeditan nama dan kelas
+    document.querySelectorAll(".editable").forEach((cell) => {
+        cell.addEventListener("blur", (e) => {
+            const rowIndex = [...e.target.parentElement.parentElement.children].indexOf(e.target.parentElement) - 1;
+            const key = e.target.classList.contains("nama") ? "nama" : "kelas";
+            participants[rowIndex][key] = e.target.textContent.trim();
+            saveToLocalStorage();
         });
     });
 }
@@ -67,13 +96,14 @@ function updateGrade(index) {
 
     // Logika sikap
     if (participant.sikap === "B-") {
-        participant.total -= 5; // Kurangi 5 poin jika sikap B-
+        participant.total -= 5;
     } else if (participant.sikap === "B") {
-        participant.total += 5; // Tambah 5 poin jika sikap B
-        participant.total = Math.min(participant.total, 100); // Maksimum 100 poin
+        participant.total += 5;
+        participant.total = Math.min(participant.total, 100);
     }
 
     participant.grade = participant.total >= 75 ? "A" : "B";
+    saveToLocalStorage();
 
     // Render ulang nilai total dan grade
     const row = tableBody.children[index];
@@ -81,7 +111,7 @@ function updateGrade(index) {
     row.querySelector(".grade").textContent = participant.grade;
 }
 
-// Download Excel
+// Unduh Excel
 document.querySelector("#downloadExcel").addEventListener("click", () => {
     const wb = XLSX.utils.book_new();
     const wsData = [
@@ -93,60 +123,34 @@ document.querySelector("#downloadExcel").addEventListener("click", () => {
     XLSX.writeFile(wb, "Penilaian-Silat.xlsx");
 });
 
-// Download PDF
+// Unduh PDF
 document.querySelector("#downloadPDF").addEventListener("click", () => {
     const doc = new jsPDF();
     doc.text("Penilaian Ekskul Pencak Silat", 10, 10);
     const tableColumn = ["No", "Nama", "Kelas", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda", "Sikap", "Total", "Grade"];
-    const tableRows = [];
+    const tableRows = participants.map((p, i) => [i + 1, p.nama, p.kelas, ...p.scores, p.sikap, p.total, p.grade]);
 
-    participants.forEach((p, i) => {
-        tableRows.push([i + 1, p.nama, p.kelas, ...p.scores, p.sikap, p.total, p.grade]);
-    });
-
-    doc.autoTable({
-        head: [tableColumn],
-        body: tableRows,
-        startY: 20,
-        theme: "striped",
-    });
-
+    doc.autoTable(tableColumn, tableRows, { startY: 20 });
     doc.save("Penilaian-Silat.pdf");
 });
 
-// Inisialisasi Signature Pad
-const canvas = document.getElementById("signatureCanvas");
-const signaturePad = new SignaturePad(canvas);
-
-// Fungsi untuk menghapus tanda tangan
-document.getElementById("clearSignature").addEventListener("click", () => {
-    signaturePad.clear();
-});
-
-// Fungsi untuk mengunduh tanda tangan sebagai JPEG
-document.getElementById("downloadJPEG").addEventListener("click", () => {
-    if (signaturePad.isEmpty()) {
-        alert("Harap tanda tangani terlebih dahulu.");
-    } else {
-        const signatureImage = signaturePad.toDataURL("image/jpeg");
+// Unduh JPEG
+document.querySelector("#downloadJPEG").addEventListener("click", () => {
+    const element = document.querySelector("#scoreTable");
+    html2canvas(element).then((canvas) => {
         const link = document.createElement("a");
-        link.href = signatureImage;
-        link.download = "Tanda-Tangan-Penguji.jpeg";
-        link.click();
-    }
-});
-
-// Fungsi untuk mendownload tabel sebagai gambar JPEG
-document.getElementById("downloadTableJPEG").addEventListener("click", () => {
-    const table = document.querySelector("table");
-    html2canvas(table, { 
-        backgroundColor: "white", 
-        logging: true 
-    }).then((canvas) => {
-        // Mengunduh gambar hasil tangkapan
-        const link = document.createElement("a");
+        link.download = "Penilaian-Silat.jpeg";
         link.href = canvas.toDataURL("image/jpeg");
-        link.download = "Tabel-Penilaian.jpeg";
         link.click();
     });
 });
+
+// Fitur Tanda Tangan
+const canvas = document.querySelector("#signatureCanvas");
+const signaturePad = new SignaturePad(canvas);
+
+document.querySelector("#clearSignature").addEventListener("click", () => {
+    signaturePad.clear();
+});
+
+renderTable();
