@@ -6,7 +6,7 @@ document.querySelector("#addParticipant").addEventListener("click", () => {
     const nama = document.querySelector("#nama").value.trim();
     const kelas = document.querySelector("#kelas").value.trim();
     if (nama && kelas) {
-        participants.push({ nama, kelas, scores: [0, 0, 0, 0, 0, 0], sikap: "B", total: 0, grade: "" });
+        participants.push({ nama, kelas, scores: [, , , , , ], sikap: "B", total: 0, grade: "" });
         saveToLocalStorage();
         renderTable();
         document.querySelector("#nama").value = "";
