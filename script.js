@@ -118,5 +118,29 @@ function updateGrade(index) {
     row.querySelector(".total").textContent = participant.total;
     row.querySelector(".grade").textContent = participant.grade;
 }
+// Unduh Excel
+document.querySelector("#downloadExcel").addEventListener("click", () => {
+    const evaluatorName = document.querySelector("#evaluatorName").value.trim();
+    const wb = XLSX.utils.book_new();
+
+    // Data Header
+    const wsData = [
+        ["Penilaian Ekskul Pencak Silat"],
+        evaluatorName ? [`Penguji: ${evaluatorName}`] : [],
+        [],
+        ["No", "Nama", "Kelas", "Push-up", "Sit-up", "Plank", "Pukulan", "Tendangan", "Kuda-kuda", "Sikap", "Total", "Grade"]
+    ];
+
+    // Tambahkan Data Peserta
+    participants.forEach((p, i) => {
+        wsData.push([i + 1, p.nama, p.kelas, ...p.scores, p.sikap, p.total, p.grade]);
+    });
+
+    // Tambahkan Worksheet
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    XLSX.utils.book_append_sheet(wb, ws, "Penilaian");
+
+    XLSX.writeFile(wb, "Penilaian-Silat.xlsx");
+});
 
 renderTable();
